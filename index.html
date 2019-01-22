@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>N子棋</title>
+
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+
+    <h2>N子棋</h2>
+    <div style="margin:1rem 0;">
+      <label>棋盘：</label>
+      <input type="number" min="3" placeholder="行" style="width:2.5rem" value="10" id="row-size">x
+      <input type="number" min="3" placeholder="列" style="width:2.5rem" value="10" id="column-size">
+      <input type="number" min="3" style="width:2.5rem;margin-left: 1rem" value="4" id="target-count">子胜利
+      <button onclick="genrateBoard()">生成棋盘</button>
+    </div>
+    <!-- We will put our React component inside this div. -->
+    <div id="game-ctn"></div>
+
+    <!-- Load React. -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+	  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Load our React component. -->
+    <script src="game.js" type="text/babel"></script>
+
+	<script type="text/babel">
+    
+    function genrateBoard(){
+      const domContainer = document.querySelector('#game-ctn');
+      const rowSize = parseInt(document.querySelector('#row-size').value);
+      const colSize = parseInt(document.querySelector('#column-size').value);
+      const targetCount = parseInt(document.querySelector('#target-count').value);
+      ReactDOM.unmountComponentAtNode(domContainer);
+      ReactDOM.render(<Game rowSize={rowSize} colSize={colSize} targetCount={targetCount} />, domContainer);
+    }
+
+    genrateBoard();
+	</script>
+  </body>
+</html>
