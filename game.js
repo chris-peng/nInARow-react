@@ -60,6 +60,9 @@ class Game extends React.Component {
     });
   }
   handleClick(i, j){
+    if(this.state.squares[i][j]){
+      return;
+    }
     const squares = deepClone2DimArray(this.state.squares);
     const lastStep = deepClone2DimArray(squares);
     squares[i][j] = this.state.xIsNext ? 'X' : 'O';
