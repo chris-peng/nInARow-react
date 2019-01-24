@@ -4,3 +4,5 @@
 3. 增加电脑对手
 
 ### 点击测试：https://chris-peng.github.io/nInARow-react/
+
+### 自动版（电脑vs电脑）地址：https://chris-peng.github.io/nInARow-react-auto/
