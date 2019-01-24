@@ -66,6 +66,7 @@ class Game extends React.Component {
   handleClick(i, j){
     this.check(i, j);
   }
+  //落子
   check(i, j){
     if(this.state.squares[i][j]){
       return;
@@ -81,6 +82,7 @@ class Game extends React.Component {
       winner: this.state.winner
     });
   }
+  //悔棋
   toLastStep(){
     this.setState({
       squares: this.state.lastStep, 
@@ -90,8 +92,14 @@ class Game extends React.Component {
       winner: this.state.winner
     });
   }
+  //当前是否电脑步骤
   isComputerStep(){
     return ((this.state.xIsNext && this.state.xIscomputer) || (!this.state.xIsNext && !this.state.xIscomputer));
+  }
+  //电脑行动
+  computerAction(){
+    let checkedPoint = getBestEvaluatePoint(this.state.squares, this.props.rowSize, this.props.colSize, this.props.targetCount, this.state.xIscomputer ? 'X' : 'O');
+    this.check(checkedPoint.r, checkedPoint.c);
   }
   componentDidMount(){
     if(this.isComputerStep()){
@@ -102,10 +110,6 @@ class Game extends React.Component {
     if(!this.state.winner && this.isComputerStep()){
       this.computerAction();
     }
-  }
-  computerAction(){
-    let checkedPoint = getBestEvaluatePoint(this.state.squares, this.props.rowSize, this.props.colSize, this.props.targetCount, this.state.xIscomputer ? 'X' : 'O');
-    this.check(checkedPoint.r, checkedPoint.c);
   }
   render(){
     this.state.winner = calculateWinner(this.state.squares, this.props.rowSize, this.props.colSize, this.props.targetCount);
@@ -131,6 +135,13 @@ class Game extends React.Component {
   }
 }
 
+/**
+ * 计算胜利者
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ */
 function calculateWinner(squares, rowSize, colSize, targetCount){
   const squareRows = getSquareRows(squares, rowSize, colSize, targetCount);
   const squareCols = getSquareCols(squares, rowSize, colSize, targetCount);
@@ -155,10 +166,24 @@ function calculateWinner(squares, rowSize, colSize, targetCount){
   return null;
 }
 
+/**
+ * 获取棋盘所有的行
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ */
 function getSquareRows(squares, rowSize, colSize, targetCount){
   return squares;
 }
 
+/**
+ * 获取棋盘所有的列
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ */
 function getSquareCols(squares, rowSize, colSize, targetCount){
   const squareCols = [];
   for(let c = 0; c < colSize; c++){
@@ -171,6 +196,13 @@ function getSquareCols(squares, rowSize, colSize, targetCount){
   return squareCols;
 }
 
+/**
+ * 获取棋盘所有的左斜线(/)方向格子数组
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ */
 function getSquareLeftDias(squares, rowSize, colSize, targetCount){
   const squareLeftDias = [];
   for(let c = targetCount - 1; c < colSize; c++){
@@ -200,6 +232,13 @@ function getSquareLeftDias(squares, rowSize, colSize, targetCount){
   return squareLeftDias;
 }
 
+/**
+ * 获取棋盘所有的右斜线(\\)方向格子数组
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ */
 function getSquareRightDias(squares, rowSize, colSize, targetCount){
   const squareRightDias = [];
   for(let c = 0; c <= colSize - targetCount; c++){
@@ -229,6 +268,11 @@ function getSquareRightDias(squares, rowSize, colSize, targetCount){
   return squareRightDias;
 }
 
+/**
+ * 计算某一行、列或斜线上是否有胜利者，若有返回胜利者
+ * @param {*} seria 
+ * @param {*} targetCount 
+ */
 function caculateSeria(seria, targetCount){
   for(let r = 0; r < seria.length; r++){
     for(let c = 0; c <= seria[r].length - targetCount; c++){
@@ -249,6 +293,14 @@ function caculateSeria(seria, targetCount){
   return null;
 }
 
+/**
+ * 电脑评价棋面，获得最佳落子位置
+ * @param {*} squares 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function getBestEvaluatePoint(squares, rowSize, colSize, targetCount, mySymbol){
   const bestPoints = [];
   const pointScores = {};
@@ -266,9 +318,20 @@ function getBestEvaluatePoint(squares, rowSize, colSize, targetCount, mySymbol){
       }
     }
   }
+  //从最佳位置中随机选择一个
   return randomItem(pointScores['score-' + bestScore]);
 }
 
+/**
+ * 评价某一位置落子的棋面得分
+ * @param {*} squares 
+ * @param {*} r       落子位置所在行，从0开始
+ * @param {*} c       落子位置所在列，从0开始
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   if(squares[r][c]){
     return Number.NEGATIVE_INFINITY;
@@ -279,6 +342,16 @@ function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
           evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol) * defenseFactor;
 }
 
+/**
+ * 评价某一位置落子的棋面攻击方面的得分
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const myRowSeria = getMyRowSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol);
   const myColSeria = getMyColSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol);
@@ -290,11 +363,31 @@ function evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol){
           evaluateAttackInSeria(myDiaRightSeria.seria, myDiaRightSeria.myIndex, targetCount, mySymbol);
 }
 
+/**
+ * 评价某一位置落子的棋面防守方面的得分，这里简单处理为“等于若对方在此落子的攻击得分”
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const oppSymbol = mySymbol === 'X' ? 'O' : 'X';
   return evaluateAttack(squares, r, c, rowSize, colSize, targetCount, oppSymbol);
 }
 
+/**
+ * 获取指定棋格所在行的所有棋格，及本身在此数组中的位置
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function getMyRowSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const seria = [squares[r][c]];
   let myIndex = 0;
@@ -308,6 +401,16 @@ function getMyRowSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   return {seria:seria, myIndex:myIndex};
 }
 
+/**
+ * 获取指定棋格所在列的所有棋格，及本身在此数组中的位置
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function getMyColSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const seria = [squares[r][c]];
   let myIndex = 0;
@@ -321,6 +424,16 @@ function getMyColSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   return {seria:seria, myIndex:myIndex};
 }
 
+/**
+ * 获取指定棋格所在左斜线的所有棋格，及本身在此数组中的位置
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function getMyDiaLeftSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const seria = [squares[r][c]];
   let myIndex = 0;
@@ -334,6 +447,16 @@ function getMyDiaLeftSeria(squares, r, c, rowSize, colSize, targetCount, mySymbo
   return {seria:seria, myIndex:myIndex};
 }
 
+/**
+ * 获取指定棋格所在右斜线的所有棋格，及本身在此数组中的位置
+ * @param {*} squares 
+ * @param {*} r 
+ * @param {*} c 
+ * @param {*} rowSize 
+ * @param {*} colSize 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function getMyDiaRightSeria(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   const seria = [squares[r][c]];
   let myIndex = 0;
@@ -347,6 +470,13 @@ function getMyDiaRightSeria(squares, r, c, rowSize, colSize, targetCount, mySymb
   return {seria:seria, myIndex:myIndex};
 }
 
+/**
+ * 计算棋格在所在行、列或斜线中的得分
+ * @param {*} seria 
+ * @param {*} myIndex 
+ * @param {*} targetCount 
+ * @param {*} mySymbol 
+ */
 function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   let mySymbolLength = 1, vMySymbolLength = 1;
   let mySymbolStartStop = false, mySymbolEndStop = false;
@@ -408,6 +538,15 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   return score;
 }
 
+/**
+ * 评价棋格在所在行、列或斜线中的“不连续情况”，转化为“相当于连续的几颗棋子”
+ * @param {*} seria 
+ * @param {*} mySymbol 
+ * @param {*} targetCount 
+ * @param {*} mySymbolLength 
+ * @param {*} continuityStartIndex 
+ * @param {*} continuityEndIndex 
+ */
 function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, continuityStartIndex, continuityEndIndex){
   const continuityThreshold = Math.ceil(targetCount / 2);
     let discontinuityLikeCount = 0;
