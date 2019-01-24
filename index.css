@@ -62,7 +62,7 @@ body {
       position: relative;
   }
 
-  .win-panel {
+  .mask-panel {
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
@@ -73,7 +73,7 @@ body {
       justify-content: center;
       align-items: center;
   }
-  .win-panel span{
+  .mask-panel span{
       color: white;
       background-color: rgba(0, 0, 0, 0.6);
       text-align: center;
