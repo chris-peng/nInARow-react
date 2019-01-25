@@ -553,7 +553,7 @@ function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, conti
     return mySymbolLength;
   }
   let discontinuityLikeCount = 0;
-  const nullFactor = 0.7;
+  const nullFactor = 0.8;
   if(mySymbolLength >= 1){
     //可进行非连续评价
     let discontinuityLikeStartOrientCount = 0;
