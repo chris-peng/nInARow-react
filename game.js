@@ -550,13 +550,13 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
 function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, continuityStartIndex, continuityEndIndex){
   const continuityThreshold = Math.ceil(targetCount / 2);
     let discontinuityLikeCount = 0;
-    const nullFactor = 0.2, flySymbolFactor = 0.2;
+    const nullFactor = 0.5, flySymbolFactor = 0.5;
     if(mySymbolLength >= continuityThreshold){
       discontinuityLikeCount = targetCount - 1;
       //可进行非连续评价
       if(mySymbolLength < targetCount - 1){
-        let discontinuityLikeStartOrientCount = targetCount - 1;
-        let discontinuityLikeEndOrientCount = targetCount - 1;
+        let discontinuityLikeStartOrientCount = 0;
+        let discontinuityLikeEndOrientCount = 0;
 
         let flySymbolCount = 0;
         let nullCount = 0;
@@ -572,9 +572,7 @@ function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, conti
           }
         }
         if(flySymbolCount > 0){
-          discontinuityLikeStartOrientCount *= Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
-        }else{
-          discontinuityLikeStartOrientCount = 0;
+          discontinuityLikeStartOrientCount = (mySymbolLength + flySymbolCount) * Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
         }
 
         flySymbolCount = 0;
@@ -591,9 +589,7 @@ function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, conti
           }
         }
         if(flySymbolCount > 0){
-          discontinuityLikeEndOrientCount *= Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
-        }else{
-          discontinuityLikeEndOrientCount = 0;
+          discontinuityLikeEndOrientCount = (mySymbolLength + flySymbolCount) * Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
         }
         discontinuityLikeCount = discontinuityLikeStartOrientCount > discontinuityLikeEndOrientCount ? 
                               discontinuityLikeStartOrientCount : discontinuityLikeEndOrientCount;
