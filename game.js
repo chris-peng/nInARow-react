@@ -308,7 +308,7 @@ function getBestEvaluatePoint(squares, rowSize, colSize, targetCount, mySymbol){
   for(let r = 0; r < rowSize; r++){
     for(let c = 0; c < colSize; c++){
       const score = evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol);
-      //console.log(r + ',' + c + ': ' + score);
+      console.log(r + ',' + c + ': ' + score);
       if(score >= bestScore){
         bestScore = score;
         if(!pointScores['score-' + bestScore]){
@@ -336,8 +336,8 @@ function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   if(squares[r][c]){
     return Number.NEGATIVE_INFINITY;
   }
-  const attackFactor = 5;
-  const defenseFactor = 4;
+  const attackFactor = 1;
+  const defenseFactor = 0.9;
   return evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol) * attackFactor +
           evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol) * defenseFactor;
 }
@@ -480,8 +480,16 @@ function getMyDiaRightSeria(squares, r, c, rowSize, colSize, targetCount, mySymb
 function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   let mySymbolLength = 1, vMySymbolLength = 1;
   let mySymbolStartStop = false, mySymbolEndStop = false;
-  let stopFactor = 1, stopFactorDec = 0.4;
+  let stopFactor = [1, 0.3, 0], stopCount = 0;
   let continuityStartIndex = myIndex, continuityEndIndex = myIndex;
+  
+  if(myIndex == 0){
+    stopCount++;
+  }
+  if(myIndex == seria.length - 1){
+    stopCount++;
+  }
+  
   for(let i = myIndex - 1; i >= 0; i--){
     if(seria[i] === mySymbol){
       if(!mySymbolStartStop){
@@ -494,17 +502,11 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
       vMySymbolLength++;
     }else{
       if(!mySymbolStartStop){
-        stopFactor -= stopFactorDec;
+        stopCount++;
       }
       mySymbolStartStop = true;
       break;
     }
-  }
-  if(myIndex == 0){
-    stopFactor -= stopFactorDec;
-  }
-  if(myIndex == seria.length - 1){
-    stopFactor -= stopFactorDec;
   }
 
   for(let i = myIndex + 1; i < seria.length; i++){
@@ -519,7 +521,7 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
       vMySymbolLength++;
     }else{
       if(!mySymbolEndStop){
-        stopFactor -= stopFactorDec;
+        stopCount++;
       }
       mySymbolEndStop = true;
       break;
@@ -527,14 +529,14 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   }
   
   if(mySymbolLength == targetCount){
-    return 9999999;
+    return 9999999999;
   }
   let score = 0;
   if(vMySymbolLength >= targetCount){
     //尝试评价不连续的情况
     const discontinuityLikeCount = evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, continuityStartIndex, continuityEndIndex);
-    const avgSymbolCount = (mySymbolLength + discontinuityLikeCount) / 2;
-    score = avgSymbolCount * avgSymbolCount * stopFactor;
+    const avgSymbolCount = mySymbolLength > discontinuityLikeCount ? mySymbolLength : discontinuityLikeCount;
+    score = Math.pow(targetCount, avgSymbolCount) * (avgSymbolCount * stopFactor[stopCount]);
   }
   return score;
 }
@@ -554,47 +556,50 @@ function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, conti
   }
   let discontinuityLikeCount = 0;
   const nullFactor = 0.8;
-  if(mySymbolLength >= 1){
-    //可进行非连续评价
-    let discontinuityLikeStartOrientCount = 0;
-    let discontinuityLikeEndOrientCount = 0;
+  let discontinuityLikeStartOrientCount = 0;
+  let discontinuityLikeEndOrientCount = 0;
 
-    let flySymbolCount = 0;
-    let nullCount = 0;
-    for(let i = 1; i <= targetCount - mySymbolLength; i++){
-      if(continuityStartIndex - i < 0){
-        break;
-      }else if(!seria[continuityStartIndex - i]){
-        nullCount++;
-      }else if(seria[continuityStartIndex - i] === mySymbol){
-        flySymbolCount++;
-      }else{
-        break;
-      }
+  let flySymbolCount = 0;
+  let nullCount = 0;
+  let stopFactor = 1;
+  for(let i = 1; i <= targetCount - mySymbolLength; i++){
+    if(continuityStartIndex - i < 0){
+      stopFactor = 0;
+      break;
+    }else if(!seria[continuityStartIndex - i]){
+      nullCount++;
+    }else if(seria[continuityStartIndex - i] === mySymbol){
+      flySymbolCount++;
+    }else{
+      stopFactor = 0;
+      break;
     }
-    if(flySymbolCount > 0){
-      discontinuityLikeStartOrientCount = flySymbolCount * Math.pow(nullFactor, nullCount);
-    }
-
-    flySymbolCount = 0;
-    nullCount = 0;
-    for(let i = 1; i <= targetCount - mySymbolLength; i++){
-      if(continuityEndIndex + i >= seria.length){
-        break;
-      }else if(!seria[continuityEndIndex + i]){
-        nullCount++;
-      }else if(seria[continuityEndIndex + i] === mySymbol){
-        flySymbolCount++;
-      }else{
-        break;
-      }
-    }
-    if(flySymbolCount > 0){
-      discontinuityLikeEndOrientCount = flySymbolCount * Math.pow(nullFactor, nullCount);
-    }
-    discontinuityLikeCount = discontinuityLikeStartOrientCount > discontinuityLikeEndOrientCount ? 
-                          discontinuityLikeStartOrientCount : discontinuityLikeEndOrientCount;
   }
+  if(flySymbolCount > 0){
+    discontinuityLikeStartOrientCount = flySymbolCount * stopFactor * Math.pow(nullFactor, nullCount);
+  }
+
+  flySymbolCount = 0;
+  nullCount = 0;
+  stopFactor = 1;
+  for(let i = 1; i <= targetCount - mySymbolLength; i++){
+    if(continuityEndIndex + i >= seria.length){
+      stopFactor = 0;
+      break;
+    }else if(!seria[continuityEndIndex + i]){
+      nullCount++;
+    }else if(seria[continuityEndIndex + i] === mySymbol){
+      flySymbolCount++;
+    }else{
+      stopFactor = 0;
+      break;
+    }
+  }
+  if(flySymbolCount > 0){
+    discontinuityLikeEndOrientCount = flySymbolCount * stopFactor * Math.pow(nullFactor, nullCount);
+  }
+  discontinuityLikeCount = discontinuityLikeStartOrientCount > discontinuityLikeEndOrientCount ? 
+                        discontinuityLikeStartOrientCount : discontinuityLikeEndOrientCount;
   return mySymbolLength + discontinuityLikeCount;
 }
 
