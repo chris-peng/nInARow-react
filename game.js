@@ -308,7 +308,7 @@ function getBestEvaluatePoint(squares, rowSize, colSize, targetCount, mySymbol){
   for(let r = 0; r < rowSize; r++){
     for(let c = 0; c < colSize; c++){
       const score = evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol);
-      console.log(r + ',' + c + ': ' + score);
+      //console.log(r + ',' + c + ': ' + score);
       if(score >= bestScore){
         bestScore = score;
         if(!pointScores['score-' + bestScore]){
@@ -336,8 +336,8 @@ function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
   if(squares[r][c]){
     return Number.NEGATIVE_INFINITY;
   }
-  const attackFactor = 3;
-  const defenseFactor = 2;
+  const attackFactor = 5;
+  const defenseFactor = 4;
   return evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol) * attackFactor +
           evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol) * defenseFactor;
 }
@@ -533,7 +533,8 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   if(vMySymbolLength >= targetCount){
     //尝试评价不连续的情况
     const discontinuityLikeCount = evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, continuityStartIndex, continuityEndIndex);
-    score = (mySymbolLength + discontinuityLikeCount) * (mySymbolLength + discontinuityLikeCount) * stopFactor;
+    const avgSymbolCount = (mySymbolLength + discontinuityLikeCount) / 2;
+    score = avgSymbolCount * avgSymbolCount * stopFactor;
   }
   return score;
 }
@@ -548,54 +549,53 @@ function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
  * @param {*} continuityEndIndex 
  */
 function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, continuityStartIndex, continuityEndIndex){
-  const continuityThreshold = Math.ceil(targetCount / 2);
-    let discontinuityLikeCount = 0;
-    const nullFactor = 0.5, flySymbolFactor = 0.5;
-    if(mySymbolLength >= continuityThreshold){
-      discontinuityLikeCount = targetCount - 1;
-      //可进行非连续评价
-      if(mySymbolLength < targetCount - 1){
-        let discontinuityLikeStartOrientCount = 0;
-        let discontinuityLikeEndOrientCount = 0;
+  if(mySymbolLength == targetCount - 1){
+    return mySymbolLength;
+  }
+  let discontinuityLikeCount = 0;
+  const nullFactor = 0.7;
+  if(mySymbolLength >= 1){
+    //可进行非连续评价
+    let discontinuityLikeStartOrientCount = 0;
+    let discontinuityLikeEndOrientCount = 0;
 
-        let flySymbolCount = 0;
-        let nullCount = 0;
-        for(let i = 1; i <= targetCount - mySymbolLength; i++){
-          if(continuityStartIndex - i < 0){
-            break;
-          }else if(!seria[continuityStartIndex - i]){
-            nullCount++;
-          }else if(seria[continuityStartIndex - i] === mySymbol){
-            flySymbolCount++;
-          }else{
-            break;
-          }
-        }
-        if(flySymbolCount > 0){
-          discontinuityLikeStartOrientCount = (mySymbolLength + flySymbolCount) * Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
-        }
-
-        flySymbolCount = 0;
-        nullCount = 0;
-        for(let i = 1; i <= targetCount - mySymbolLength; i++){
-          if(continuityStartIndex + i >= seria.length){
-            break;
-          }else if(!seria[continuityStartIndex + i]){
-            nullCount++;
-          }else if(seria[continuityStartIndex + i] === mySymbol){
-            flySymbolCount++;
-          }else{
-            break;
-          }
-        }
-        if(flySymbolCount > 0){
-          discontinuityLikeEndOrientCount = (mySymbolLength + flySymbolCount) * Math.pow(nullFactor, nullCount) * (1 - Math.pow(1 - flySymbolFactor, flySymbolCount));
-        }
-        discontinuityLikeCount = discontinuityLikeStartOrientCount > discontinuityLikeEndOrientCount ? 
-                              discontinuityLikeStartOrientCount : discontinuityLikeEndOrientCount;
+    let flySymbolCount = 0;
+    let nullCount = 0;
+    for(let i = 1; i <= targetCount - mySymbolLength; i++){
+      if(continuityStartIndex - i < 0){
+        break;
+      }else if(!seria[continuityStartIndex - i]){
+        nullCount++;
+      }else if(seria[continuityStartIndex - i] === mySymbol){
+        flySymbolCount++;
+      }else{
+        break;
       }
     }
-    return discontinuityLikeCount;
+    if(flySymbolCount > 0){
+      discontinuityLikeStartOrientCount = flySymbolCount * Math.pow(nullFactor, nullCount);
+    }
+
+    flySymbolCount = 0;
+    nullCount = 0;
+    for(let i = 1; i <= targetCount - mySymbolLength; i++){
+      if(continuityEndIndex + i >= seria.length){
+        break;
+      }else if(!seria[continuityEndIndex + i]){
+        nullCount++;
+      }else if(seria[continuityEndIndex + i] === mySymbol){
+        flySymbolCount++;
+      }else{
+        break;
+      }
+    }
+    if(flySymbolCount > 0){
+      discontinuityLikeEndOrientCount = flySymbolCount * Math.pow(nullFactor, nullCount);
+    }
+    discontinuityLikeCount = discontinuityLikeStartOrientCount > discontinuityLikeEndOrientCount ? 
+                          discontinuityLikeStartOrientCount : discontinuityLikeEndOrientCount;
+  }
+  return mySymbolLength + discontinuityLikeCount;
 }
 
 function deepClone2DimArray(array){
