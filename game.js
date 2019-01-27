@@ -337,7 +337,7 @@ function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
     return Number.NEGATIVE_INFINITY;
   }
   const attackFactor = 1;
-  const defenseFactor = 0.6;
+  const defenseFactor = 0.5;
   return evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol) * attackFactor +
           evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol) * defenseFactor;
 }
