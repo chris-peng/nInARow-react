@@ -337,7 +337,7 @@ function evaluate(squares, r, c, rowSize, colSize, targetCount, mySymbol){
     return Number.NEGATIVE_INFINITY;
   }
   const attackFactor = 1;
-  const defenseFactor = 0.9;
+  const defenseFactor = 0.6;
   return evaluateAttack(squares, r, c, rowSize, colSize, targetCount, mySymbol) * attackFactor +
           evaluateDefense(squares, r, c, rowSize, colSize, targetCount, mySymbol) * defenseFactor;
 }
@@ -480,7 +480,7 @@ function getMyDiaRightSeria(squares, r, c, rowSize, colSize, targetCount, mySymb
 function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
   let mySymbolLength = 1, vMySymbolLength = 1;
   let mySymbolStartStop = false, mySymbolEndStop = false;
-  let stopFactor = [1, 0.3, 0], stopCount = 0;
+  let stopFactor = [1, 0.4, 0], stopCount = 0;
   let continuityStartIndex = myIndex, continuityEndIndex = myIndex;
   
   if(myIndex == 0){
@@ -555,7 +555,7 @@ function evaluateDisContinue(seria, mySymbol, targetCount, mySymbolLength, conti
     return mySymbolLength;
   }
   let discontinuityLikeCount = 0;
-  const nullFactor = 0.8;
+  const nullFactor = 0.7;
   let discontinuityLikeStartOrientCount = 0;
   let discontinuityLikeEndOrientCount = 0;
 
