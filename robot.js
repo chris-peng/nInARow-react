@@ -186,7 +186,7 @@ function getBestEvaluatePoint(squares, rowSize, colSize, targetCount, mySymbol){
   function evaluateAttackInSeria(seria, myIndex, targetCount, mySymbol){
     let mySymbolLength = 1, vMySymbolLength = 1;
     let mySymbolStartStop = false, mySymbolEndStop = false;
-    let stopFactor = [1, 0.4, 0], stopCount = 0;
+    let stopFactor = [1, 0.3, 0], stopCount = 0;
     let continuityStartIndex = myIndex, continuityEndIndex = myIndex;
     
     if(myIndex == 0){

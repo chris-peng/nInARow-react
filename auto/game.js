@@ -3,7 +3,9 @@
 class Square extends React.Component {
   render() {
     return (
-      <button className={`square ${this.props.isLastPosition ? 'last-position' : ''} ${this.props.isWinPos ? 'win-position' : ''}`} onClick={this.props.onClick}>
+      <button className={`square ${this.props.isLastPosition ? ' last-position' : ''}` +
+          `${this.props.isWinPos ? ' win-position' : ''}` +
+          `${this.props.isTipPos ? ' tip-position' : ''}`} onClick={this.props.onClick}>
         {this.props.value}
       </button>
     );
@@ -24,6 +26,7 @@ class Board extends React.Component {
         if(i == this.props.winPos[k].r
             && j == this.props.winPos[k].c){
           isWinPos = true;
+          break;
         }
       }
     }
