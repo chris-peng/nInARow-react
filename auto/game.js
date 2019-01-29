@@ -53,6 +53,7 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  _delay = 100;
   winner = null;
   constructor(props){
     super(props);
@@ -102,7 +103,8 @@ class Game extends React.Component {
   }
   //当前是否电脑步骤
   isComputerStep(){
-    return ((this.state.xIsNext && this.state.xIscomputer) || (!this.state.xIsNext && !this.state.xIscomputer));
+    //return ((this.state.xIsNext && this.state.xIscomputer) || (!this.state.xIsNext && !this.state.xIscomputer));
+    return true;
   }
   //电脑行动
   computerAction(){
@@ -116,7 +118,16 @@ class Game extends React.Component {
   }
   componentDidUpdate(){
     if(!this.winner && this.isComputerStep()){
-      this.computerAction();
+      setTimeout(()=>this.computerAction(), this._delay);
+    }
+  }
+  slowly(){
+    this._delay += 100;
+  }
+  quickly(){
+    this._delay -= 100;
+    if(this._delay < 0){
+      this._delay = 0;
     }
   }
   render(){
@@ -131,16 +142,17 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board-ctn">
-          <div className={`game-board cursor-${this.state.xIsNext ? 'X' : 'O'}`}>
-            <Board squares={this.state.squares} onClick={(i, j) => this.handleClick(i, j)} lastPosition={this.state.lastPosition} winPos={winPos}/>
+          <div className={`game-board`}>
+            <Board squares={this.state.squares} /* onClick={(i, j) => this.handleClick(i, j)} */ lastPosition={this.state.lastPosition} winPos={winPos}/>
           </div>
           {this.winner ? <div className="mask-panel"><span>{this.winner}胜利!</span></div> : null}
-          {this.isComputerStep() && !this.winner ? <div className="mask-panel"><span>{this.winner}对方正在思考...</span></div> : null}
         </div>
         <div className="game-info">
-          <div>　我：{this.state.xIscomputer ? 'O' : 'X'}</div>
+          <div>电脑：{this.state.xIscomputer ? 'O' : 'X'}</div>
           <div>电脑：{this.state.xIscomputer ? 'X' : 'O'}</div>
           <br/>
+          <button onClick={() => this.slowly()}>减慢</button>
+          <button onClick={() => this.quickly()}>加快</button>
           {this.state.lastStep && !this.winner && !this.isComputerStep() ? <button onClick={() => this.toLastStep()}>悔棋</button> : null}
           {this.winner ? <button onClick={() => this.initGame()}>再来一局</button> : null}
         </div>

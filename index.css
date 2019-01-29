@@ -79,3 +79,11 @@ body {
       text-align: center;
       padding: .5rem;
   }
+
+  .last-position {
+    color: blue;
+  }
+
+  .win-position {
+    color: red;
+  }

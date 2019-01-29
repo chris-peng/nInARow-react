@@ -2,17 +2,17 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>N子棋</title>
+    <title>N子棋(自动版)</title>
 
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="../index.css">
   </head>
   <body>
 
     <h2>N子棋</h2>
     <div style="margin:1rem 0;">
       <label>棋盘：</label>
-      <input type="number" min="3" style="width:2.5rem" value="15" id="row-size">行 x
-      <input type="number" min="3" style="width:2.5rem" value="15" id="column-size">列
+      <input type="number" min="3" style="width:2.5rem" value="20" id="row-size">行 x
+      <input type="number" min="3" style="width:2.5rem" value="20" id="column-size">列
       <input type="number" min="3" style="width:2rem;margin-left: 1rem" value="5" id="target-count">子胜利
       <button onclick="genrateBoard()">生成棋盘</button>
     </div>
@@ -27,8 +27,8 @@
 
     <!-- Load our React component. -->
     <script src="game.js" type="text/babel"></script>
-    <script src="winner-calculator.js" type="text/javascript"></script>
-    <script src="robot.js" type="text/javascript"></script>
+    <script src="../winner-calculator.js" type="text/javascript"></script>
+    <script src="../robot.js" type="text/javascript"></script>
 
 	<script type="text/babel">
     
