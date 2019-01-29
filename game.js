@@ -3,7 +3,9 @@
 class Square extends React.Component {
   render() {
     return (
-      <button className={`square ${this.props.isLastPosition ? 'last-position' : ''} ${this.props.isWinPos ? 'win-position' : ''}`} onClick={this.props.onClick}>
+      <button className={`square ${this.props.isLastPosition ? 'last-position' : ''}` +
+          `${this.props.isWinPos ? 'win-position' : ''}` +
+          `${this.props.isTipPos ? 'tip-position' : ''}`} onClick={this.props.onClick}>
         {this.props.value}
       </button>
     );
@@ -27,11 +29,19 @@ class Board extends React.Component {
         }
       }
     }
+    let isTipPos = false;
+    if(this.props.tipPosition){
+      if(i == this.props.tipPosition.r
+        && j == this.props.tipPosition.c){
+          isTipPos = true;
+      }
+    }
     return <Square 
               value={this.props.squares[i][j]}
               onClick={() => this.props.onClick(i, j)}
               isLastPosition={isLastPosition}
               isWinPos={isWinPos}
+              isTipPos={isTipPos}
               key={`${i}-${j}`}
             />;
   }
@@ -68,7 +78,8 @@ class Game extends React.Component {
       xIsNext: true,
       xIscomputer: randomBoolean(),
       lastStep: null,
-      lastPosition: null
+      lastPosition: null,
+      tipPosition: null
     };
   }
   initGame(){
@@ -90,14 +101,23 @@ class Game extends React.Component {
       squares: squares, 
       xIsNext: !this.state.xIsNext,
       lastStep: lastStep,
-      lastPosition: {r:i, c:j}
+      lastPosition: {r:i, c:j},
+      tipPosition: null
     });
   }
   //悔棋
   toLastStep(){
     this.setState({
       squares: this.state.lastStep,
-      lastStep: null
+      lastStep: null,
+      tipPosition: null
+    });
+  }
+  //提示
+  tip(){
+    let checkedPoint = getBestEvaluatePoint(this.state.squares, this.props.rowSize, this.props.colSize, this.props.targetCount, this.state.xIscomputer ? 'X' : 'O');
+    this.setState({
+      tipPosition: {r:checkedPoint.r, c:checkedPoint.c}
     });
   }
   //当前是否电脑步骤
@@ -132,7 +152,8 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board-ctn">
           <div className={`game-board cursor-${this.state.xIsNext ? 'X' : 'O'}`}>
-            <Board squares={this.state.squares} onClick={(i, j) => this.handleClick(i, j)} lastPosition={this.state.lastPosition} winPos={winPos}/>
+            <Board squares={this.state.squares} onClick={(i, j) => this.handleClick(i, j)}
+              lastPosition={this.state.lastPosition} winPos={winPos} tipPosition={this.state.tipPosition}/>
           </div>
           {this.winner ? <div className="mask-panel"><span>{this.winner}胜利!</span></div> : null}
           {this.isComputerStep() && !this.winner ? <div className="mask-panel"><span>{this.winner}对方正在思考...</span></div> : null}
@@ -141,8 +162,9 @@ class Game extends React.Component {
           <div>　我：{this.state.xIscomputer ? 'O' : 'X'}</div>
           <div>电脑：{this.state.xIscomputer ? 'X' : 'O'}</div>
           <br/>
-          {this.state.lastStep && !this.winner && !this.isComputerStep() ? <button onClick={() => this.toLastStep()}>悔棋</button> : null}
-          {this.winner ? <button onClick={() => this.initGame()}>再来一局</button> : null}
+          {this.state.lastStep && !this.winner && !this.isComputerStep() ? <div className='oper-btn'><button onClick={() => this.toLastStep()}>悔棋</button></div> : null}
+          {!this.winner && !this.isComputerStep() ? <div className='oper-btn'><button onClick={() => this.tip()}>提示</button></div> : null}
+          {this.winner ? <div className='oper-btn'><button onClick={() => this.initGame()}>再来一局</button></div> : null}
         </div>
       </div>
     );

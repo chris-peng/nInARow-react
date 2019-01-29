@@ -87,3 +87,39 @@ body {
   .win-position {
     color: red;
   }
+
+  .oper-btn{
+    padding: .5rem 0;
+  }
+
+  .tip-position
+  {
+    animation:tip-ani 1s infinite alternate ease-in-out;
+    -moz-animation:tip-ani 1s infinite alternate ease-in-out; /* Firefox */
+    -webkit-animation:tip-ani 1s infinite alternate ease-in-out; /* Safari and Chrome */
+    -o-animation:tip-ani 1s infinite alternate ease-in-out; /* Opera */
+  }
+
+  @keyframes tip-ani
+  {
+    from {background:white;}
+    to {background:#C0FF3E;}
+  }
+
+  @-moz-keyframes tip-ani /* Firefox */
+  {
+    from {background:white;}
+    to {background:#C0FF3E;}
+  }
+
+  @-webkit-keyframes tip-ani /* Safari and Chrome */
+  {
+    from {background:white;}
+    to {background:#C0FF3E;}
+  }
+
+  @-o-keyframes tip-ani /* Opera */
+  {
+    from {background:white;}
+    to {background:#C0FF3E;}
+  }
