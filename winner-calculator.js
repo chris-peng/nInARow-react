@@ -7,21 +7,21 @@
  */
 function calculateWinner(squares, rowSize, colSize, targetCount){
     const squareRows = getSquareRows(squares, rowSize, colSize, targetCount);
-    const squareCols = getSquareCols(squares, rowSize, colSize, targetCount);
-    const squareLeftDias = getSquareLeftDias(squares, rowSize, colSize, targetCount);
-    const squareDiaRight = getSquareRightDias(squares, rowSize, colSize, targetCount);
     let winner = caculateSeria(squareRows, targetCount);
     if(winner){
       return winner;
     }
+    const squareCols = getSquareCols(squares, rowSize, colSize, targetCount);
     winner = caculateSeria(squareCols, targetCount);
     if(winner){
       return winner;
     }
+    const squareLeftDias = getSquareLeftDias(squares, rowSize, colSize, targetCount);
     winner = caculateSeria(squareLeftDias, targetCount);
     if(winner){
       return winner;
     }
+    const squareDiaRight = getSquareRightDias(squares, rowSize, colSize, targetCount);
     winner = caculateSeria(squareDiaRight, targetCount);
     if(winner){
       return winner;
